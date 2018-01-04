@@ -413,6 +413,14 @@ public:
     {
         assert (false);
     }
+    void range_pull (rai::range_pull const &) override
+    {
+        assert (false);
+    }
+    void range_push (rai::range_push const &) override
+    {
+        assert (false);
+    }
     void frontier_req (rai::frontier_req const &) override
     {
         assert (false);

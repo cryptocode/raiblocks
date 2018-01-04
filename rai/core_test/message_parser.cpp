@@ -12,6 +12,8 @@ public:
     confirm_ack_count (0),
     bulk_pull_count (0),
     bulk_push_count (0),
+    range_pull_count (0),
+    range_push_count (0),
     frontier_req_count (0)
     {
     }
@@ -39,6 +41,14 @@ public:
     {
         ++bulk_push_count;
     }
+    void range_pull (rai::range_pull const &)
+    {
+        ++range_pull_count;
+    }
+    void range_push (rai::range_push const &)
+    {
+        ++range_push_count;
+    }
     void frontier_req (rai::frontier_req const &)
     {
         ++frontier_req_count;
@@ -49,6 +59,8 @@ public:
     uint64_t confirm_ack_count;
     uint64_t bulk_pull_count;
     uint64_t bulk_push_count;
+    uint64_t range_pull_count;
+    uint64_t range_push_count;
     uint64_t frontier_req_count;
 };
 }

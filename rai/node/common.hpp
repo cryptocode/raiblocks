@@ -92,6 +92,8 @@ enum class message_type : uint8_t
     confirm_ack,
     bulk_pull,
     bulk_push,
+    range_pull,
+    range_push,
     frontier_req
 };
 class message_visitor;
@@ -210,6 +212,25 @@ public:
     void serialize (rai::stream &) override;
     void visit (rai::message_visitor &) const override;
 };
+class range_pull : public message
+{
+public:
+    range_pull ();
+    bool deserialize (rai::stream &) override;
+    void serialize (rai::stream &) override;
+    void visit (rai::message_visitor &) const override;
+    rai::block_hash min_hash;
+    rai::block_hash max_hash;
+    uint32_t count;
+};
+class range_push : public message
+{
+public:
+    range_push ();
+    bool deserialize (rai::stream &) override;
+    void serialize (rai::stream &) override;
+    void visit (rai::message_visitor &) const override;
+};
 class message_visitor
 {
 public:
@@ -219,6 +240,8 @@ public:
     virtual void confirm_ack (rai::confirm_ack const &) = 0;
     virtual void bulk_pull (rai::bulk_pull const &) = 0;
     virtual void bulk_push (rai::bulk_push const &) = 0;
+    virtual void range_pull (rai::range_pull const &) = 0;
+    virtual void range_push (rai::range_push const &) = 0;
     virtual void frontier_req (rai::frontier_req const &) = 0;
 };
 }

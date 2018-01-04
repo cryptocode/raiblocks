@@ -518,3 +518,61 @@ void rai::bulk_push::visit (rai::message_visitor & visitor_a) const
 {
 	visitor_a.bulk_push (*this);
 }
+
+rai::range_pull::range_pull () :
+message (rai::message_type::range_pull)
+{
+}
+
+void rai::range_pull::visit (rai::message_visitor & visitor_a) const
+{
+    visitor_a.range_pull (*this);
+}
+
+bool rai::range_pull::deserialize (rai::stream & stream_a)
+{
+    auto result (read_header (stream_a, version_max, version_using, version_min, type, extensions));
+    assert (!result);
+    assert (rai::message_type::range_pull == type);
+    if (!result)
+    {
+        assert (type == rai::message_type::range_pull);
+        result = read (stream_a, min_hash);
+        if (!result)
+        {
+            result = read (stream_a, max_hash);
+        }
+    }
+    return result;
+}
+
+void rai::range_pull::serialize (rai::stream & stream_a)
+{
+    write_header (stream_a);
+    write (stream_a, min_hash);
+    write (stream_a, max_hash);
+}
+
+rai::range_push::range_push () :
+message (rai::message_type::range_push)
+{
+}
+
+bool rai::range_push::deserialize (rai::stream & stream_a)
+{
+    auto result (read_header (stream_a, version_max, version_using, version_min, type, extensions));
+    assert (!result);
+    assert (rai::message_type::range_push == type);
+    return result;
+}
+
+void rai::range_push::serialize (rai::stream & stream_a)
+{
+    write_header (stream_a);
+}
+
+void rai::range_push::visit (rai::message_visitor & visitor_a) const
+{
+    visitor_a.range_push (*this);
+}
+
