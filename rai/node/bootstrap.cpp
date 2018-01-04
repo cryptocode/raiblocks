@@ -1385,6 +1385,16 @@ public:
         auto response (std::make_shared <rai::bulk_push_server> (connection));
         response->receive ();
     }
+    void range_pull (rai::range_pull const &) override
+    {
+        // No impl
+        assert(false);
+    }
+    void range_push (rai::range_push const &) override
+    {
+        // No impl
+        assert(false);
+    }
     void frontier_req (rai::frontier_req const &) override
     {
         auto response (std::make_shared <rai::frontier_req_server> (connection, std::unique_ptr <rai::frontier_req> (static_cast <rai::frontier_req *> (connection->requests.front ().release ()))));
