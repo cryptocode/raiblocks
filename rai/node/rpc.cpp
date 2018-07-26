@@ -3223,28 +3223,35 @@ void rai::rpc_handler::send ()
 								if (!error)
 								{
 									boost::optional<std::string> send_id (request.get_optional<std::string> ("id"));
-									if (balance >= amount.number ())
+									if (send_id.is_initialized () && send_id->size () > 0)
 									{
-										auto rpc_l (shared_from_this ());
-										auto response_a (response);
-										existing->second->send_async (source, destination, amount.number (), [response_a](std::shared_ptr<rai::block> block_a) {
-											if (block_a != nullptr)
-											{
-												rai::uint256_union hash (block_a->hash ());
-												boost::property_tree::ptree response_l;
-												response_l.put ("block", hash.to_string ());
-												response_a (response_l);
-											}
-											else
-											{
-												error_response (response_a, "Error generating block");
-											}
-										},
-										work == 0, send_id);
+										if (balance >= amount.number ())
+										{
+											auto rpc_l (shared_from_this ());
+											auto response_a (response);
+											existing->second->send_async (source, destination, amount.number (), [response_a](std::shared_ptr<rai::block> block_a) {
+												if (block_a != nullptr)
+												{
+													rai::uint256_union hash (block_a->hash ());
+													boost::property_tree::ptree response_l;
+													response_l.put ("block", hash.to_string ());
+													response_a (response_l);
+												}
+												else
+												{
+													error_response (response_a, "Error generating block");
+												}
+											},
+											work == 0, send_id);
+										}
+										else
+										{
+											error_response (response, "Insufficient balance");
+										}
 									}
 									else
 									{
-										error_response (response, "Insufficient balance");
+										error_response (response, "Invalid send id");
 									}
 								}
 							}

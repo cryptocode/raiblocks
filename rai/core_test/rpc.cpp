@@ -251,6 +251,7 @@ TEST (rpc, send)
 	request.put ("source", rai::test_genesis_key.pub.to_account ());
 	request.put ("destination", rai::test_genesis_key.pub.to_account ());
 	request.put ("amount", "100");
+	request.put ("id", "123abc");
 	std::thread thread2 ([&system]() {
 		auto iterations (0);
 		while (system.nodes[0]->balance (rai::test_genesis_key.pub) == rai::genesis_amount)
@@ -274,6 +275,36 @@ TEST (rpc, send)
 	thread2.join ();
 }
 
+TEST (rpc, send_missing_id)
+{
+	rai::system system (24000, 1);
+	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
+	rpc.start ();
+	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
+	boost::property_tree::ptree request;
+	std::string wallet;
+	system.nodes[0]->wallets.items.begin ()->first.encode_hex (wallet);
+	request.put ("wallet", wallet);
+	request.put ("action", "send");
+	request.put ("source", rai::test_genesis_key.pub.to_account ());
+	request.put ("destination", rai::test_genesis_key.pub.to_account ());
+	request.put ("amount", "100");
+	test_response response (request, rpc, system.service);
+	while (response.status == 0)
+	{
+		system.poll ();
+	}
+	ASSERT_EQ (response.json.get<std::string> ("error"), "Invalid send id");
+
+	request.put ("id", "");
+	test_response response_empty_id (request, rpc, system.service);
+	while (response_empty_id.status == 0)
+	{
+		system.poll ();
+	}
+	ASSERT_EQ (response_empty_id.json.get<std::string> ("error"), "Invalid send id");
+}
+
 TEST (rpc, send_fail)
 {
 	rai::system system (24000, 1);
@@ -287,6 +318,7 @@ TEST (rpc, send_fail)
 	request.put ("source", rai::test_genesis_key.pub.to_account ());
 	request.put ("destination", rai::test_genesis_key.pub.to_account ());
 	request.put ("amount", "100");
+	request.put ("id", "123abc");
 	std::atomic<bool> done (false);
 	std::thread thread2 ([&system, &done]() {
 		auto iterations (0);
@@ -321,6 +353,7 @@ TEST (rpc, send_work)
 	request.put ("source", rai::test_genesis_key.pub.to_account ());
 	request.put ("destination", rai::test_genesis_key.pub.to_account ());
 	request.put ("amount", "100");
+	request.put ("id", "123abc");
 	request.put ("work", "1");
 	test_response response (request, rpc, system.service);
 	auto iterations1 (0);
