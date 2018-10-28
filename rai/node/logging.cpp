@@ -42,7 +42,7 @@ void rai::logging::init (boost::filesystem::path const & application_path_a)
 
 void rai::logging::serialize_json (boost::property_tree::ptree & tree_a) const
 {
-	tree_a.put ("version", "4");
+	tree_a.put ("version", std::to_string (json_version));
 	tree_a.put ("ledger", ledger_logging_value);
 	tree_a.put ("ledger_duplicate", ledger_duplicate_logging_value);
 	tree_a.put ("vote", vote_logging_value);
@@ -65,21 +65,19 @@ void rai::logging::serialize_json (boost::property_tree::ptree & tree_a) const
 
 bool rai::logging::upgrade_json (unsigned version_a, boost::property_tree::ptree & tree_a)
 {
+	tree_a.put ("version", std::to_string (json_version));
 	auto result (false);
 	switch (version_a)
 	{
 		case 1:
 			tree_a.put ("vote", vote_logging_value);
-			tree_a.put ("version", "2");
 			result = true;
 		case 2:
 			tree_a.put ("rotation_size", "4194304");
 			tree_a.put ("flush", "true");
-			tree_a.put ("version", "3");
 			result = true;
 		case 3:
 			tree_a.put ("network_node_id_handshake", "false");
-			tree_a.put ("version", "4");
 			result = true;
 		case 4:
 			break;
