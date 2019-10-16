@@ -300,6 +300,7 @@ void nano::active_transactions::request_confirm (nano::unique_lock<std::mutex> &
 	std::deque<std::shared_ptr<nano::block>> blocks_bundle_l;
 	std::unordered_map<std::shared_ptr<nano::transport::channel>, std::deque<std::pair<nano::block_hash, nano::root>>> batched_confirm_req_bundle_l;
 	std::deque<std::pair<std::shared_ptr<nano::block>, std::shared_ptr<std::vector<std::shared_ptr<nano::transport::channel>>>>> single_confirm_req_bundle_l;
+	auto roots_size_l (roots.size ());
 	lock_a.unlock ();
 
 	/*
@@ -310,7 +311,7 @@ void nano::active_transactions::request_confirm (nano::unique_lock<std::mutex> &
 	// Due to the confirmation height processor working asynchronously and compressing several roots into one frontier, probably_unconfirmed_frontiers can be wrong
 	{
 		auto pending_confirmation_height_size (node.pending_confirmation_height.size ());
-		bool probably_unconfirmed_frontiers (node.ledger.block_count_cache > node.ledger.cemented_count + roots.size () + pending_confirmation_height_size);
+		bool probably_unconfirmed_frontiers (node.ledger.block_count_cache > node.ledger.cemented_count + roots_size_l + pending_confirmation_height_size);
 		bool bootstrap_weight_reached (node.ledger.block_count_cache >= node.ledger.bootstrap_weight_max_blocks);
 		if (node.config.frontiers_confirmation != nano::frontiers_confirmation_mode::disabled && bootstrap_weight_reached && probably_unconfirmed_frontiers && pending_confirmation_height_size < confirmed_frontiers_max_pending_cut_off)
 		{
@@ -327,7 +328,7 @@ void nano::active_transactions::request_confirm (nano::unique_lock<std::mutex> &
 	auto election_ttl_cutoff_l (std::chrono::steady_clock::now () - election_time_to_live);
 
 	auto const representatives_l (node.rep_crawler.representatives (std::numeric_limits<size_t>::max ()));
-	auto roots_size_l (roots.size ());
+	roots_size_l = roots.size ();
 	auto & sorted_roots_l = roots.get<1> ();
 	size_t count_l{ 0 };
 
