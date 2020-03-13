@@ -159,7 +159,8 @@ nano::error nano::ipc::access::deserialize_toml (nano::tomlconfig & toml)
 		}
 		else if (role_l->is_table_array ())
 		{
-			for (auto & table : *role_l->as_table_array ())
+			auto role_table_array_l (role_l->as_table_array ());
+			for (auto & table : *role_table_array_l)
 			{
 				if (table->contains ("deny"))
 				{
@@ -221,7 +222,8 @@ nano::error nano::ipc::access::deserialize_toml (nano::tomlconfig & toml)
 		}
 		else if (user_l->is_table_array ())
 		{
-			for (auto & table : *user_l->as_table_array ())
+			auto table_array_l (user_l->as_table_array ());
+			for (auto & table : *table_array_l)
 			{
 				auto user = get_user (table);
 				if (user.id.empty () && users.size () > 0)
